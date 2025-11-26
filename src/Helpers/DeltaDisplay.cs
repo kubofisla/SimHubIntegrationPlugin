@@ -19,11 +19,12 @@ namespace Loupedeck.SimHubIntegrationPlugin.Helpers
         public bool IsPositive { get; set; }
         public bool IsNegative { get; set; }
         public bool IsZero { get; set; }
+        public double AbsoluteDelta { get; set; }
 
         /// <summary>
         /// Format delta seconds into display components.
-        /// Example: -1.234 => Sign: "-", Seconds: "1", Thousandths: "234", Color: Yellow
-        /// Example: +0.567 => Sign: "+", Seconds: "0", Thousandths: "567", Color: Green
+        /// Example: -1.234 => Sign: "-", Seconds: "1.", Thousandths: "234", Color: Yellow
+        /// Example: +0.567 => Sign: "+", Seconds: "0.", Thousandths: "567", Color: Green
         /// </summary>
         public static DeltaDisplay FromSeconds(double deltaSeconds)
         {
@@ -32,12 +33,13 @@ namespace Loupedeck.SimHubIntegrationPlugin.Helpers
             if (deltaSeconds == 0)
             {
                 display.Sign = " ";
-                display.Seconds = "0";
+                display.Seconds = "0.";
                 display.Thousandths = "000";
                 display.Empty = "";
                 display.IsZero = true;
                 display.IsPositive = false;
                 display.IsNegative = false;
+                display.AbsoluteDelta = 0;
                 return display;
             }
 
@@ -46,6 +48,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Helpers
             
             // Get absolute value for formatting
             double absDelta = Math.Abs(deltaSeconds);
+            display.AbsoluteDelta = absDelta;
             
             // Sign
             display.Sign = display.IsNegative ? "−" : "+";
@@ -61,7 +64,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Helpers
                 seconds += 1;
             }
             
-            display.Seconds = seconds.ToString();
+            display.Seconds = seconds.ToString() + ".";
             display.Thousandths = milliseconds.ToString("D3"); // Pad to 3 digits
             display.Empty = "";
             
@@ -69,17 +72,25 @@ namespace Loupedeck.SimHubIntegrationPlugin.Helpers
         }
 
         /// <summary>
-        /// Gets CSS color based on delta sign.
-        /// Yellow for positive (too slow), Green for negative (faster than target)
+        /// Gets CSS color based on delta magnitude.
+        /// Green: within ±0.25s
+        /// Yellow: ±0.25s to ±0.5s
+        /// Orange: ±0.5s to ±1.0s
+        /// Red: ±1.0s or more
         /// </summary>
         public string GetBackgroundColor()
         {
-            if (this.IsPositive)
-                return "#FFD700"; // Yellow
-            else if (this.IsNegative)
+            if (this.IsZero)
+                return "#00AA00"; // Green for on target
+            
+            if (this.AbsoluteDelta <= 0.25)
                 return "#00AA00"; // Green
+            else if (this.AbsoluteDelta <= 0.5)
+                return "#FFD700"; // Yellow
+            else if (this.AbsoluteDelta <= 1.0)
+                return "#FFA500"; // Orange
             else
-                return "#666666"; // Gray
+                return "#FF0000"; // Red
         }
     }
 }
