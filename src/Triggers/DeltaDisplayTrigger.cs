@@ -8,7 +8,6 @@ namespace Loupedeck.SimHubIntegrationPlugin.Triggers
     using Loupedeck.SimHubIntegrationPlugin;
     using Loupedeck.SimHubIntegrationPlugin.Data;
     using Loupedeck.SimHubIntegrationPlugin.Helpers;
-    using global::SimHubIntegrationPlugin.Data;
 
     public class DeltaDisplayTrigger : PluginDynamicCommand, IDataTrigger
     {

@@ -16,6 +16,12 @@ dotnet build src\SimHubIntegrationPlugin.csproj --configuration Release
 dotnet build src\SimHubIntegrationPlugin.csproj --configuration Debug
 ```
 
+### Build and run all tests
+When asked to "build and run all tests" (or similar, like "full build" or "run tests") for this repository, run from the repository root:
+```powershell
+dotnet test
+```
+
 ### Clean build artifacts
 ```powershell
 dotnet clean src\SimHubIntegrationPlugin.csproj

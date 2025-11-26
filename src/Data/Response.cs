@@ -14,8 +14,22 @@ namespace Loupedeck.SimHubIntegrationPlugin.Data
                 return this._dict;
             }
 
-            this._dict = JsonSerializer.Deserialize<Dictionary<String, String>>(this._raw);
-            return this._dict ?? [];
+            // Parse into JsonDocument first so we can gracefully handle
+            // both string and non-string JSON values.
+            using var doc = JsonDocument.Parse(this._raw);
+            var root = doc.RootElement;
+
+            var dict = new Dictionary<String, String>(StringComparer.OrdinalIgnoreCase);
+            foreach (var property in root.EnumerateObject())
+            {
+                // Use ToString() so numbers, booleans etc. become their
+                // textual representation, which the downstream parsers
+                // (TimeSpan.Parse, Double.Parse, Decimal.Parse) expect.
+                dict[property.Name] = property.Value.ToString();
+            }
+
+            this._dict = dict;
+            return this._dict;
         }
     }
 }

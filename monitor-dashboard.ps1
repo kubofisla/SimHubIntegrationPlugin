@@ -2,7 +2,7 @@
 # Periodically fetches and displays data from SimHub dashboard endpoint
 
 param(
-    [int]$IntervalSeconds = 5,
+    [int]$IntervalSeconds = 2,
     [string]$Url = "http://localhost:8080/dashboarddata/"
 )
 
@@ -14,6 +14,7 @@ Write-Host "Press Ctrl+C to stop`n" -ForegroundColor Yellow
 $iteration = 0
 
 while ($true) {
+    Clear-Host
     $iteration++
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     

@@ -1,7 +1,7 @@
-namespace SimHubIntegrationPlugin.Data
+namespace Loupedeck.SimHubIntegrationPlugin.Data
 {
     using Loupedeck.SimHubIntegrationPlugin;
-    using Loupedeck.SimHubIntegrationPlugin.Data;
+
     public class SimHubData
     {
         private String _lastRawData;
@@ -44,9 +44,15 @@ namespace SimHubIntegrationPlugin.Data
             this._cancellationTokenSource?.Cancel();
             this._monitorTask?.Wait();
             PluginLog.Info("SimHub data monitoring stopped...");
-}
+        }
 
-        private void ProcessNewData(String newValue)
+        public Boolean ResetTargetToFastestLap() => this._dataLoader.ResetTargetToFastestLap();
+
+        public Boolean ResetTargetToLastLap() => this._dataLoader.ResetTargetToLastLap();
+
+        public Boolean AdjustTargetBy(Double deltaSeconds) => this._dataLoader.AdjustTargetBy(deltaSeconds);
+
+        public void ProcessNewData(String newValue)
         {
             Response response = new(newValue);
             var dataDict = response.Parse();
@@ -54,14 +60,30 @@ namespace SimHubIntegrationPlugin.Data
             {
                 try
                 {
-                    Enum.TryParse<EDataKey>(pair.Key, out var eValue);
-                    if (this.Data.TryGetValue(eValue, out var existingData))
+                    // Map JSON key to enum value.
+                    if (!Enum.TryParse<EDataKey>(pair.Key, out var eValue))
                     {
-                        var newDataValue = EDataKeyMapping.Mapping[eValue].ParseFunc(pair.Value);
-                        if (!Equals(existingData.Value, newDataValue))
-                        {
-                            existingData.Value = newDataValue;
-                        }
+                        continue;
+                    }
+
+                    // Only process keys we know how to parse.
+                    if (!EDataKeyMapping.Mapping.TryGetValue(eValue, out var keyMeta))
+                    {
+                        continue;
+                    }
+
+                    // Ensure a binding exists for this key so that commands
+                    // like LapTargetCommand can still attach as triggers later.
+                    if (!this.Data.TryGetValue(eValue, out var existingData))
+                    {
+                        existingData = new Binding<dynamic>(null);
+                        this.Data[eValue] = existingData;
+                    }
+
+                    var newDataValue = keyMeta.ParseFunc(pair.Value);
+                    if (!Equals(existingData.Value, newDataValue))
+                    {
+                        existingData.Value = newDataValue;
                     }
                 }
                 catch (ArgumentNullException ex)
@@ -73,7 +95,6 @@ namespace SimHubIntegrationPlugin.Data
                     PluginLog.Error(ex, $"Unexpected error while processing data for key {pair.Key}");
                     throw;
                 }
-                
             }
         }
     }
