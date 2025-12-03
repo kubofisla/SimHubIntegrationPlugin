@@ -31,14 +31,14 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
             {
                 this.DisplayName = "Target Δ";
                 this.Description = "Adjust target time by fixed deltas";
-                this.GroupName = "Racing";
+                this.GroupName = "Timing";
 
-                this.AddParameter(nameof(DeltaVariant.Increase1_0), "+1.0", "+1.0s target time");
-                this.AddParameter(nameof(DeltaVariant.Decrease1_0), "-1.0", "-1.0s target time");
-                this.AddParameter(nameof(DeltaVariant.Increase0_5), "+0.5", "+0.5s target time");
-                this.AddParameter(nameof(DeltaVariant.Decrease0_5), "-0.5", "-0.5s target time");
-                this.AddParameter(nameof(DeltaVariant.Increase0_1), "+0.1", "+0.1s target time");
-                this.AddParameter(nameof(DeltaVariant.Decrease0_1), "-0.1", "-0.1s target time");
+                this.AddParameter(nameof(DeltaVariant.Increase1_0), "+1.0", this.GroupName);
+                this.AddParameter(nameof(DeltaVariant.Decrease1_0), "-1.0", this.GroupName);
+                this.AddParameter(nameof(DeltaVariant.Increase0_5), "+0.5", this.GroupName);
+                this.AddParameter(nameof(DeltaVariant.Decrease0_5), "-0.5", this.GroupName);
+                this.AddParameter(nameof(DeltaVariant.Increase0_1), "+0.1", this.GroupName);
+                this.AddParameter(nameof(DeltaVariant.Decrease0_1), "-0.1", this.GroupName);
             }
             catch (Exception ex)
             {

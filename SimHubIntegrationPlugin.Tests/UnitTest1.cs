@@ -4,7 +4,6 @@ using System.Text;
 using System.Text.Json;
 
 using Loupedeck.SimHubIntegrationPlugin.Data;
-using SimHubIntegrationPlugin.Data;
 
 namespace SimHubIntegrationPlugin.Tests;
 
@@ -73,6 +72,54 @@ public class DataLoaderTests
         var doc = JsonDocument.Parse(body);
         Assert.Equal(0.5, doc.RootElement.GetProperty("delta").GetDouble());
     }
+
+    [Fact]
+    public void ResetTargetToFastestLap_SendsPostToCorrectEndpoint()
+    {
+        // Arrange
+        HttpRequestMessage? capturedRequest = null;
+        var handler = new StubHttpMessageHandler(req =>
+        {
+            capturedRequest = req;
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        });
+
+        var httpClient = new HttpClient(handler);
+        var loader = new DataLoader("localhost", httpClient);
+
+        // Act
+        var result = loader.ResetTargetToFastestLap();
+
+        // Assert
+        Assert.True(result);
+        Assert.NotNull(capturedRequest);
+        Assert.Equal(HttpMethod.Post, capturedRequest!.Method);
+        Assert.EndsWith("/dashboarddata/resettofast", capturedRequest!.RequestUri!.ToString());
+    }
+
+    [Fact]
+    public void ResetTargetToLastLap_SendsPostToCorrectEndpoint()
+    {
+        // Arrange
+        HttpRequestMessage? capturedRequest = null;
+        var handler = new StubHttpMessageHandler(req =>
+        {
+            capturedRequest = req;
+            return new HttpResponseMessage(HttpStatusCode.OK);
+        });
+
+        var httpClient = new HttpClient(handler);
+        var loader = new DataLoader("localhost", httpClient);
+
+        // Act
+        var result = loader.ResetTargetToLastLap();
+
+        // Assert
+        Assert.True(result);
+        Assert.NotNull(capturedRequest);
+        Assert.Equal(HttpMethod.Post, capturedRequest!.Method);
+        Assert.EndsWith("/dashboarddata/resettolast", capturedRequest!.RequestUri!.ToString());
+    }
 }
 
 public class SimHubDataTests
@@ -95,6 +142,6 @@ public class SimHubDataTests
         simHub.ProcessNewData(json);
 
         // Assert
-        Assert.Equal(120.5, binding.Value);
+        Assert.Equal(TimeSpan.FromSeconds(120.5), binding.Value);
     }
 }

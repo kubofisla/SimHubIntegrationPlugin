@@ -4,10 +4,13 @@ namespace Loupedeck.SimHubIntegrationPlugin.Data
     {
         LastLapTime,
         CurrentLapTime,
-        FastestLapTime,
-        CompactDelta,
+        BestLapTime,
+        SessionBest,
         SessionBestLiveDeltaSeconds,
-        TargetTime
+        TargetTime,
+        TargetTimeDelta,
+        LapInvalidated
+
     }
 
     public static class EDataKeyMapping
@@ -26,17 +29,17 @@ namespace Loupedeck.SimHubIntegrationPlugin.Data
                 Type = typeof(TimeSpan),
                 ParseFunc = (x) => TimeSpan.Parse(x)
             },
-            [EDataKey.FastestLapTime] = new EDataKeyStructure<Object>
+            [EDataKey.BestLapTime] = new EDataKeyStructure<Object>
             {
-                Key = EDataKey.FastestLapTime,
+                Key = EDataKey.BestLapTime,
                 Type = typeof(TimeSpan),
                 ParseFunc = (x) => TimeSpan.Parse(x)
             },
-            [EDataKey.CompactDelta] = new EDataKeyStructure<Object>
+            [EDataKey.SessionBest] = new EDataKeyStructure<Object>
             {
-                Key = EDataKey.CompactDelta,
-                Type = typeof(Decimal),
-                ParseFunc = (x) => Decimal.Parse(x)
+                Key = EDataKey.SessionBest,
+                Type = typeof(TimeSpan),
+                ParseFunc = (x) => TimeSpan.Parse(x)
             },
             [EDataKey.SessionBestLiveDeltaSeconds] = new EDataKeyStructure<Object>
             {
@@ -47,8 +50,20 @@ namespace Loupedeck.SimHubIntegrationPlugin.Data
             [EDataKey.TargetTime] = new EDataKeyStructure<Object>
             {
                 Key = EDataKey.TargetTime,
-                Type = typeof(Double),
-                ParseFunc = (x) => Double.Parse(x)
+                Type = typeof(TimeSpan),
+                ParseFunc = (x) => TimeSpan.FromSeconds(Double.Parse(x))
+            },
+            [EDataKey.TargetTimeDelta] = new EDataKeyStructure<Object>
+            {
+                Key = EDataKey.TargetTimeDelta,
+                Type = typeof(TimeSpan),
+                ParseFunc = (x) => TimeSpan.FromSeconds(Double.Parse(x))
+            },
+            [EDataKey.LapInvalidated] = new EDataKeyStructure<Object>
+            {
+                Key = EDataKey.LapInvalidated,
+                Type = typeof(Boolean),
+                ParseFunc = (x) => Boolean.Parse(x)
             }
         };
     }

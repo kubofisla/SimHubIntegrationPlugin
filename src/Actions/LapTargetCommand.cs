@@ -27,15 +27,15 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
             {
                 this.DisplayName = "Lap Target";
                 this.Description = "Set target time from last / fastest lap";
-                this.GroupName = "Racing";
+                this.GroupName = "Timing";
 
                 // Ensure bindings exist for the lap times we display.
                 this.EnsureBinding(EDataKey.LastLapTime);
-                this.EnsureBinding(EDataKey.FastestLapTime);
+                this.EnsureBinding(EDataKey.SessionBest);
 
                 // Parameters for last vs fastest.
-                this.AddParameter(nameof(LapTargetType.LastLap), string.Empty, "Target = Last lap time");
-                this.AddParameter(nameof(LapTargetType.FastestLap), string.Empty, "Target = Fastest lap time");
+                this.AddParameter(nameof(LapTargetType.LastLap), "Target = Last lap time", this.GroupName);
+                this.AddParameter(nameof(LapTargetType.FastestLap), "Target = Fastest lap time", this.GroupName);
             }
             catch (Exception ex)
             {
@@ -48,7 +48,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
         {
             var data = SimHubData.Instance.Data;
 
-            if (!data.ContainsKey(key))
+            if (!data.TryGetValue(key, out var value))
             {
                 PluginLog.Info($"LapTargetCommand: Creating new binding for {key}");
                 data[key] = new Binding<dynamic>(this);
@@ -56,7 +56,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
             else
             {
                 PluginLog.Info($"LapTargetCommand: Adding trigger to existing {key} binding");
-                data[key].AddTrigger(this);
+                value.AddTrigger(this);
             }
         }
 
@@ -75,9 +75,9 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
                 // Determine which SimHub key and label to use.
                 var key = targetType == LapTargetType.LastLap
                     ? EDataKey.LastLapTime
-                    : EDataKey.FastestLapTime;
+                    : EDataKey.SessionBest;
 
-                var label = targetType == LapTargetType.LastLap ? "LAST" : "BEST";
+                var label = targetType == LapTargetType.LastLap ? "LAST" : "FAST";
 
                 TimeSpan? lapTime = null;
                 if (SimHubData.Instance.Data.TryGetValue(key, out var binding) && binding.Value is TimeSpan ts)
@@ -85,7 +85,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
                     lapTime = ts;
                 }
 
-                var timeText = lapTime.HasValue ? this.FormatLapTime(lapTime.Value) : "--:--.---";
+                var timeText = lapTime.HasValue ? this.FormatLapTime(lapTime.Value) : "--.-";
 
                 // Determine image size.
                 var width = imageSize == PluginImageSize.Width90 ? 90 : 80;
@@ -104,7 +104,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
                     graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
                     // Draw label at top.
-                    using (var labelFont = new Font("Segoe UI", 14f, FontStyle.Bold))
+                    using (var labelFont = new Font("Segoe UI", 18f, FontStyle.Bold))
                     using (var labelBrush = new SolidBrush(Color.White))
                     {
                         var labelRect = new RectangleF(0, 2, width, height * 0.3f);
@@ -118,7 +118,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
                     }
 
                     // Draw lap time centered in remaining area.
-                    using (var timeFont = new Font("Segoe UI", 18f, FontStyle.Bold))
+                    using (var timeFont = new Font("Segoe UI", 25f, FontStyle.Bold))
                     using (var timeBrush = new SolidBrush(Color.White))
                     {
                         var timeRect = new RectangleF(0, height * 0.25f, width, height * 0.7f);
@@ -192,12 +192,11 @@ namespace Loupedeck.SimHubIntegrationPlugin.Actions
 
         private String FormatLapTime(TimeSpan time)
         {
-            // Format as m:ss.fff (e.g., 1:23.456)
-            var totalMinutes = (Int32)time.TotalMinutes;
+            // Format as ss.f (e.g., 23.4)
             var seconds = time.Seconds;
             var milliseconds = time.Milliseconds;
 
-            return $"{totalMinutes}:{seconds:00}.{milliseconds:000}";
+            return $"{seconds:00}.{milliseconds / 100:0}";
         }
     }
 }

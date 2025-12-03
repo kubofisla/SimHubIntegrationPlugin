@@ -10,7 +10,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Data
         private readonly DataLoader _dataLoader;
         private static readonly Lazy<SimHubData> _lazy = new(() => new SimHubData());
         public static SimHubData Instance => _lazy.Value;
-        public readonly Dictionary<EDataKey, Binding<dynamic>> Data = new();
+        public readonly Dictionary<EDataKey, Binding<dynamic>> Data = [];
 
         public SimHubData()
         {
@@ -34,7 +34,7 @@ namespace Loupedeck.SimHubIntegrationPlugin.Data
                         this._lastRawData = newValue;
                         this.ProcessNewData(newValue);
                     }
-                    await Task.Delay(1000, this._cancellationTokenSource.Token);
+                    await Task.Delay(500, this._cancellationTokenSource.Token);
                 }
             }, this._cancellationTokenSource.Token);
         }

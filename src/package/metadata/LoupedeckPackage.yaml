@@ -9,19 +9,19 @@ type: plugin4
 name: SimHubIntegration
 
 # Plugin name that is shown to the user.
-displayName: SimHubIntegration
+displayName: SimHub Integration
 
 # Short description of the plugin.
-description: Provides functionality of SimHub in Loupedeck device.
+description: Loupedeck plugin that surfaces SimHub racing telemetry (including target delta display) on CT-family devices.
 
 # Name of the plugin library file.
 pluginFileName: SimHubIntegrationPlugin.dll
 
 # Plugin version.
-version: 1.0
+version: 0.1.0
 
 # Author of the plugin. The author can be a company or an individual developer.
-author: kubof
+author: Jakub Fisla
 
 # Copyright information.
 copyright: Copyright © 2025 kubof. All rights reserved.
@@ -74,7 +74,7 @@ licenseUrl: https://opensource.org/licenses/MIT
 # URL of the support page where the users can send improvement suggestions and report bugs.
 # The URL is shown in Loupedeck Marketplace. The page can be for example a GitHub issues page.
 # NOTE: This setting is recommended when publishing the plugin in Loupedeck Marketplace.
-#supportPageUrl: https://github.com/myusername/myplugin/issues
+supportPageUrl: https://github.com/kubofisla/SimHubIntegrationPlugin/issues
 
 # URL of the plugin homepage. The URL is shown in Loupedeck Marketplace.
-#homePageUrl: https://github.com/myusername/myplugin
+homePageUrl: https://github.com/kubofisla/SimHubIntegrationPlugin

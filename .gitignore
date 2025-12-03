@@ -397,4 +397,10 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
+# Antigravity files
+.agent/
+
+# Plugin package files
+*.lplug4
+
 .DS_Store
